@@ -16,17 +16,17 @@
 
 'use strict';
 
-const React = require('react');
-const findNodeHandle = require('../../modules/findNodeHandle');
-const ScrollView = require('../ScrollView');
-const View = require('../View');
-const { computeWindowedRenderLimits } = require('./VirtualizeUtils');
-const FillRateHelper = require('./FillRateHelper');
-const Batchinator = require('./Batchinator');
-const ViewabilityHelper = require('./ViewabilityHelper');
-const StyleSheet = require('../../apis/StyleSheet');
-const invariant = require('fbjs/lib/invariant');
-const warning = require('fbjs/lib/warning');
+import React from 'react';
+import findNodeHandle from '../../modules/findNodeHandle';
+import ScrollView from '../ScrollView';
+import View from '../View';
+import VirtualizeUtils from './VirtualizeUtils';
+import FillRateHelper from './FillRateHelper';
+import Batchinator from './Batchinator';
+import ViewabilityHelper from './ViewabilityHelper';
+import StyleSheet from '../../apis/StyleSheet';
+import invariant from 'fbjs/lib/invariant';
+import warning from 'fbjs/lib/warning';
 
 import type { ViewabilityConfig, ViewToken } from './ViewabilityHelper';
 
@@ -301,7 +301,25 @@ class VirtualizedList extends React.PureComponent<OptionalProps, Props, State> {
     maxToRenderPerBatch: 10,
     onEndReachedThreshold: 2, // multiples of length
     renderScrollComponent: (props: Props) => {
-      return <ScrollView {...props} />;
+      const scrollViewProps = Object.assign({}, props);
+      delete scrollViewProps.initialNumToRender;
+      delete scrollViewProps.keyExtractor;
+      delete scrollViewProps.renderItem;
+      delete scrollViewProps.ItemSeparatorComponent;
+      delete scrollViewProps.ListFooterComponent;
+      delete scrollViewProps.ListHeaderComponent;
+      delete scrollViewProps.disableVirtualization;
+      delete scrollViewProps.maxToRenderPerBatch;
+      delete scrollViewProps.onEndReachedThreshold;
+      delete scrollViewProps.renderScrollComponent;
+      delete scrollViewProps.updateCellsBatchingPeriod;
+      delete scrollViewProps.windowSize;
+      delete scrollViewProps.numColumns;
+      delete scrollViewProps.getItem;
+      delete scrollViewProps.getItemCount;
+      delete scrollViewProps.onViewableItemsChanged;
+
+      return <ScrollView {...scrollViewProps} />;
 
       // TODO: Uncomment this section once RefreshControl is supported
       // if (props.onRefresh) {
@@ -931,7 +949,7 @@ class VirtualizedList extends React.PureComponent<OptionalProps, Props, State> {
     this.setState(state => {
       let newState;
       if (!disableVirtualization) {
-        newState = computeWindowedRenderLimits(
+        newState = VirtualizeUtils.computeWindowedRenderLimits(
           this.props,
           state,
           this._getFrameMetricsApprox,
